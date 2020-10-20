@@ -152,12 +152,22 @@ class device:
     def encrypt(self, payload: bytes) -> bytes:
         """Encrypt the payload."""
         encryptor = self.aes.encryptor()
-        return encryptor.update(payload) + encryptor.finalize()
+        encrypted = encryptor.update(payload) + encryptor.finalize()
+
+        print("*** encrypt() before: ", payload, "\n")
+        print("*** encrypt() after: ", encrypted, "\n")
+
+        return encrypted
 
     def decrypt(self, payload: bytes) -> bytes:
         """Decrypt the payload."""
         decryptor = self.aes.decryptor()
-        return decryptor.update(payload) + decryptor.finalize()
+        decrypted = decryptor.update(payload) + decryptor.finalize()
+
+        print("*** decrypt() before: ", payload, "\n")
+        print("*** decrypt() after: ", decrypted, "\n")
+
+        return decrypted
 
     def auth(self) -> bool:
         """Authenticate to the device."""
@@ -323,5 +333,7 @@ class device:
         checksum = resp[0x20] | (resp[0x21] << 8)
         if sum(resp, 0xbeaf) - sum(resp[0x20:0x22]) & 0xffff != checksum:
             raise exception(-4008)  # Checksum error.
+
+        print("*** send_packet() received: ", resp, "\n")
 
         return resp
